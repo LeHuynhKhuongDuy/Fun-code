@@ -1,4 +1,5 @@
 import pygame
+import random
 
 running = True
 
@@ -16,7 +17,19 @@ snake_pos = [95, 55]
 snake_body = [[95, 55], [85, 55], [75, 55]]
 snake_body_size = block_size / 2
 
+food_pos = [random.randrange(1, (width//block_size)) * block_size,
+            random.randrange(1, (height//block_size)) * block_size]
+
 direction = "RIGHT"
+
+def show_game_over():
+    win.fill((0, 0, 0))  # Black background
+    text = pygame.font.("You Lose!", True, RED)
+    win.blit(text, (width//3, height//3))  # Position text at the center
+    pygame.display.flip()  # Update the display
+    pygame.time.delay(2000)  # Pause for 2 seconds before quitting
+    pygame.quit()
+    quit()
 
 pygame.init()
 
@@ -56,19 +69,25 @@ while running:
     #     snake_pos[1] = snake_pos[1] - height
     # if snake_pos[1] < 0:
     #     snake_pos[1] = snake_pos[1] + height
-    print("-------------")
-    print(snake_pos)
+    # above become below
     snake_pos[0] = snake_pos[0] % width
     snake_pos[1] = snake_pos[1] % height
-    print(snake_pos)
-    
+
     snake_body.insert(0, [snake_pos[0], snake_pos[1]])
-    snake_body.pop()
+    if snake_pos == [food_pos[0] + 5, food_pos[1] + 5]:
+        food_pos = [random.randrange(1, (width//block_size)) * block_size,
+                    random.randrange(1, (height//block_size)) * block_size]
+    else:
+        snake_body.pop()
+
+    if snake_pos in snake_body[1:]:
+        show_game_over()
 
     win.fill(BLACK)
     for block in snake_body:
         pygame.draw.circle(win, GREEN, (block[0], block[1]), snake_body_size)
     
+    pygame.draw.rect(win, RED, pygame.Rect(food_pos[0], food_pos[1], block_size, block_size))
 
     pygame.display.update()
 
